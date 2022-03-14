@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="//cdn.muicss.com/mui-0.10.3/css/mui.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script
+      async
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBsugP2mR-olR5zI3aH3tJBA2cU7Y6A-3Y&callback=initMap&libraries=&v=weekly"
+    ></script>
+    <style>
+      *,
+      *::after,
+      *::before {
+        box-sizing: border-box;
+      }
+
+      #map {
+	height: 200px;
+	width: 50%;
+      }
+
+      body {
+        margin: 10% 25%;
+        background-color: peachpuff;
+      }
+
+      .container {
+        background-color: #181a1b;
+        color: #ffffff;
+        border-radius: 1em;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: auto;
+      }
+    </style>
+    <title>Lab 4 Maps</title>
+  </head>
+  <body>
+    <div class="container mui--z5">
+      <p class="mui--text-display4">Find your location</p>
+      <p class="mui--text-display2" id="location"></p>
+      <p class="mui--text-display2" id="address"></p>
+      <div id="map"></div>
+      <button class="mui-btn mui-btn--primary" onclick="getLocation()">
+        Get Location
+      </button>
+    </div>
+  </body>
+</html>
+<script>
+  let x = document.getElementById("location");
+  function getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+      x.innerHTML = "Geolocation is not supported by this browser.";
+    }
+  }
+
+  
+
+  function showPosition(position) {
+    x.innerHTML =
+      "Latitude: " +
+      position.coords.latitude +
+      "<br>Longitude: " +
+      position.coords.longitude;
+
+    let latlng = new google.maps.LatLng(
+      position.coords.latitude,
+      position.coords.longitude
+    );
+    map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 14,
+    center: latlng,
+    });
+    marker = new google.maps.Marker({
+	position: latlng,
+	map: map,
+    });
+    infoWindow = new google.maps.InfoWindow(
+	{ content: "<h5 style='color:black;'> your location </h5>"});
+	marker.addListener("click", function()
+		{ infoWindow.open(map, marker); });
+    marker2 = new google.maps.Marker({
+	position: { lat: 43.65782146185646, lng: -79.37880169438598 },
+	map: map,
+    });
+    infoWindow2 = new google.maps.InfoWindow(
+	{ content: "<h5 style='color:black;'> ryerson university </h5>"});
+	marker.addListener("click", function()
+		{ infoWindow2.open(map, marker2); });
+    let geocoder = new google.maps.Geocoder();
+    // This is making the Geocode request
+    geocoder.geocode({ latLng: latlng }, (results, status) => {
+      if (status !== google.maps.GeocoderStatus.OK) {
+        alert(status);
+      }
+      if (status == google.maps.GeocoderStatus.OK) {
+        console.log(results);
+        let address = results[0].formatted_address;
+        document.getElementById("address").innerHTML = address;
+      }
+    });
+  }
+</script>
